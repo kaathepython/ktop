@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Function to display usage instructions
+display_usage() {
+  echo "Usage: $0 <resource_type> <namespace>"
+  echo "Example: $0 node kube-system"
+}
+
+# Check if correct number of arguments are passed
+if [ $# -ne 2 ]; then
+  display_usage
+  exit 1
+fi
+
+# Check if resource type is valid
+if [[ "$1" != "node" && "$1" != "pod" ]]; then
+  echo "Invalid resource type. Please specify 'node' or 'pod'."
+  display_usage
+  exit 1
+fi
+
+# Fetch resource usage statistics and format the output
+kubectl top "$1" -n "$2" | awk -v resource_type="$1" -v ns="$2" 'NR>1 {print resource_type ", " ns ", " $1 ", " $2 ", " $3}'
